@@ -1,38 +1,171 @@
 {% extends "base.html" %}
-{% set title = "Home — Larah" %}
+{% set title = "Larah" %}
 
 {% block content %}
-  <div class="hero">
+<style>
+  /* ── Hero card ── */
+  .hero {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 0;
+    margin-bottom: 2rem;
+  }
+  .hero .headshot {
+    width: 160px;
+    height: 200px;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: 10px 0 0 10px;
+    display: block;
+    flex-shrink: 0;
+  }
+  .hero__panel {
+    background: rgba(228,228,222,0.50);
+    border: 1.5px solid rgba(89,95,57,0.15);
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+    padding: 1.4rem 1.6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .hero__name {
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    font-weight: 800;
+    color: var(--text);
+    margin: 0 0 0.45rem;
+    line-height: 1.1;
+  }
+  .hero__roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.9rem;
+  }
+  .hero__role-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.63rem;
+    color: var(--moss);
+    background: rgba(89,95,57,0.08);
+    border: 1px solid rgba(89,95,57,0.18);
+    border-radius: 4px;
+    padding: 0.15rem 0.5rem;
+  }
+  .hero__bio {
+    font-size: 0.82rem;
+    color: rgba(27,27,27,0.72);
+    line-height: 1.72;
+    margin: 0 0 1.1rem;
+    max-width: 46ch;
+  }
+  .hero__actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  /* ── Skill strips ── */
+  .home-skills {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.55rem;
+    max-width: 680px;
+  }
+  .skill-strip {
+    background: var(--surface-soft);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-xs);
+    padding: 0.85rem 1rem;
+    transition: border-color 160ms ease;
+  }
+  .skill-strip:hover { border-color: var(--moss-mid); }
+  .skill-strip__title {
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+  }
+  .skill-strip__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  .skill-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--muted);
+    background: rgba(27,27,27,0.05);
+    border-radius: 3px;
+    padding: 0.1rem 0.4rem;
+  }
+
+  @media (max-width: 520px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero .headshot { width: 100%; height: 180px; border-radius: 10px 10px 0 0; }
+    .hero__panel { border-left: 1.5px solid rgba(89,95,57,0.15); border-top: none; border-radius: 0 0 10px 10px; }
+    .home-skills { grid-template-columns: 1fr; }
+  }
+</style>
+
+<!-- Hero -->
+<div class="hero">
   <img src="{{ url_for('static', filename='img/IMG_2.png') }}"
-       alt="Professional headshot"
+       alt="Larah"
        class="headshot">
-  <div>
-    <h1>Larah</h1>
-    <p class="muted">BI Engineer • Data Engineer • Analytics Engineer</p>
+  <div class="hero__panel">
+    <h1 class="hero__name">Larah</h1>
+    <div class="hero__roles">
+      <span class="hero__role-tag">BI Engineer</span>
+      <span class="hero__role-tag">Data Engineer</span>
+      <span class="hero__role-tag">Analytics Engineer</span>
+    </div>
+    <p class="hero__bio">Five years connecting people, systems, and data — building pipelines, models, and apps that help teams move faster without sacrificing quality.</p>
+    <div class="hero__actions">
+      <a class="btn btn--primary" href="{{ url_for('projects') }}">View Projects</a>
+      <a class="btn btn--ghost"   href="{{ url_for('work') }}">Work History</a>
+    </div>
   </div>
 </div>
 
-  <h1>Connecting people, systems, and data so teams can build together.</h1>
-  <p class="muted" style="max-width:70ch;">
-    I build trusted datasets, clean pipelines, and dashboards/apps that help teams make decisions faster—without
-    sacrificing data quality.
-  </p>
-
-  <div class="actions">
-    <a class="btn btn--primary" href="{{ url_for('projects') }}">View Projects</a>
-
-  </div>
-
-  <div class="grid" style="margin-top:18px;">
-    <div class="card">
-      <h3>Data Engineering</h3>
-      <p class="muted">Delta Lake, Airflow/Databricks orchestration, API-based ingestion, quality processing.</p>
-      <div class="meta">Databricks • SQL • Python • Angular</div>
-    </div>
-    <div class="card">
-      <h3>BI & Analytics</h3>
-      <p class="muted">KPIs and Tableau dashboards built on scalable datasets</p>
-      <div class="meta">Tableau • Modeling • Data Quality</div>
+<!-- Skills -->
+<div class="home-skills">
+  <div class="skill-strip">
+    <div class="skill-strip__title">Data Engineering</div>
+    <div class="skill-strip__tags">
+      <span class="skill-tag">Databricks</span>
+      <span class="skill-tag">Delta Lake</span>
+      <span class="skill-tag">Python</span>
+      <span class="skill-tag">PySpark</span>
+      <span class="skill-tag">SQL</span>
     </div>
   </div>
+  <div class="skill-strip">
+    <div class="skill-strip__title">BI & Analytics</div>
+    <div class="skill-strip__tags">
+      <span class="skill-tag">Tableau</span>
+      <span class="skill-tag">Data Modeling</span>
+      <span class="skill-tag">Data Quality</span>
+      <span class="skill-tag">KPI Design</span>
+    </div>
+  </div>
+  <div class="skill-strip">
+    <div class="skill-strip__title">Application Layer</div>
+    <div class="skill-strip__tags">
+      <span class="skill-tag">FastAPI</span>
+      <span class="skill-tag">Angular</span>
+      <span class="skill-tag">Flask</span>
+      <span class="skill-tag">REST APIs</span>
+    </div>
+  </div>
+  <div class="skill-strip">
+    <div class="skill-strip__title">Infrastructure</div>
+    <div class="skill-strip__tags">
+      <span class="skill-tag">SharePoint</span>
+      <span class="skill-tag">Power Automate</span>
+      <span class="skill-tag">AWS CLI</span>
+      <span class="skill-tag">Azure</span>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

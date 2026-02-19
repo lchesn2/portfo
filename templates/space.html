@@ -212,39 +212,116 @@
 
 
 <script>
-async function refreshData() {
-  const btn   = document.getElementById('refresh-btn');
-  const label = document.getElementById('badge-label');
-  const dot   = document.getElementById('badge-dot');
+// ── Terminal helpers ──────────────────────────────────────────────────────
+function openTerminal() {
+  document.getElementById('terminal-body').innerHTML = '';
+  document.getElementById('terminal-overlay').classList.add('sw-terminal-overlay--show');
+}
+function closeTerminal(e) {
+  // only close if clicking the backdrop, not the terminal box itself
+  if (e && e.target !== document.getElementById('terminal-overlay')) return;
+  document.getElementById('terminal-overlay').classList.remove('sw-terminal-overlay--show');
+}
+function termLog(msg, cls) {
+  const body = document.getElementById('terminal-body');
+  const line = document.createElement('div');
+  line.className = 'sw-terminal__line' + (cls ? ' ' + cls : '');
+  line.textContent = msg;
+  body.appendChild(line);
+  body.scrollTop = body.scrollHeight;
+}
+function termDelay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-  btn.disabled    = true;
-  btn.textContent = '⏳ Fetching...';
+// ── Simulated log sequence (runs in parallel with real fetch) ─────────────
+async function runTerminalLogs(resultPromise) {
+  const now = () => new Date().toISOString().substring(11,19);
+
+  termLog('$ python space_weather.py', 'sw-t-cmd');
+  await termDelay(180);
+  termLog(`[${now()}] INFO  Starting NOAA SWPC fetch...`);
+  await termDelay(300);
+  termLog(`[${now()}] INFO  GET solar-wind/plasma-2-hour.json`);
+  await termDelay(420);
+  termLog(`[${now()}] INFO  GET solar-wind/mag-2-hour.json`);
+  await termDelay(380);
+  termLog(`[${now()}] INFO  GET products/noaa-planetary-k-index.json`);
+  await termDelay(350);
+  termLog(`[${now()}] INFO  GET products/noaa-scales.json`);
+  await termDelay(300);
+  termLog(`[${now()}] INFO  GET products/alerts.json`);
+  await termDelay(250);
+  termLog(`[${now()}] INFO  Parsing solar wind plasma...`);
+  await termDelay(180);
+  termLog(`[${now()}] INFO  Parsing magnetometer (Bz)...`);
+  await termDelay(160);
+  termLog(`[${now()}] INFO  Parsing Kp index...`);
+  await termDelay(140);
+  termLog(`[${now()}] INFO  Parsing NOAA storm scales...`);
+  await termDelay(120);
+  termLog(`[${now()}] INFO  Parsing active alerts...`);
+  await termDelay(200);
+
+  // Wait for the real fetch to finish
+  const result = await resultPromise;
+
+  if (result.ok) {
+    const ts = result.fetched_at || '';
+    termLog(`[${now()}] INFO  Writing cache → static/data/space_weather_cache.json`);
+    await termDelay(150);
+    termLog(`[${now()}] INFO  wind: ${result.solar_wind_speed ?? '—'} km/s  Bz: ${result.bz ?? '—'} nT  Kp: ${result.kp ?? '—'}  G-scale: ${result.g_scale ?? '—'}`);
+    await termDelay(120);
+    termLog(`[${now()}] INFO  Done. fetched_at=${ts.substring(0,19).replace('T',' ')} UTC`, 'sw-t-ok');
+    await termDelay(200);
+    termLog(`[${now()}] INFO  Reloading page...`, 'sw-t-ok');
+    await termDelay(900);
+    window.location.reload();
+  } else {
+    termLog(`[${now()}] ERROR ${result.error || 'Fetch failed'}`, 'sw-t-err');
+    await termDelay(200);
+    termLog(`[${now()}] ERROR Refresh aborted. Check NOAA API connectivity.`, 'sw-t-err');
+  }
+}
+
+// ── Main refresh function ─────────────────────────────────────────────────
+async function refreshData() {
+  const btn = document.getElementById('refresh-btn');
+  const dot = document.getElementById('badge-dot');
+
+  btn.disabled         = true;
+  btn.textContent      = '⏳ Fetching...';
   dot.style.background = '#c8a400';
 
-  try {
-    const res  = await fetch('/space/refresh', { method: 'POST' });
-    const data = await res.json();
+  openTerminal();
 
-    if (data.ok) {
-      const ts = data.fetched_at ? data.fetched_at.substring(0, 16).replace('T', ' ') + ' UTC' : 'just now';
-      label.textContent    = 'Updated ' + ts;
-      dot.style.background = '';
-      btn.textContent      = '✓ Done';
-      // Reload after short delay so all panels update with fresh data
-      setTimeout(() => window.location.reload(), 800);
-    } else {
-      label.textContent    = 'Refresh failed';
-      dot.style.background = '#b83232';
-      btn.disabled         = false;
-      btn.textContent      = '↻ Retry';
-    }
-  } catch (e) {
-    label.textContent    = 'Network error';
+  // Kick off real fetch — don't await yet, let terminal logs run in parallel
+  const fetchPromise = fetch('/space/refresh', { method: 'POST' })
+    .then(r => r.json())
+    .catch(e => ({ ok: false, error: e.message }));
+
+  // Run logs alongside the fetch
+  await runTerminalLogs(fetchPromise);
+
+  // If failed, re-enable button
+  const result = await fetchPromise.catch(() => ({ ok: false }));
+  if (!result.ok) {
+    btn.disabled    = false;
+    btn.textContent = '↻ Retry';
     dot.style.background = '#b83232';
-    btn.disabled         = false;
-    btn.textContent      = '↻ Retry';
   }
 }
 </script>
+
+<!-- Terminal modal -->
+<div class="sw-terminal-overlay" id="terminal-overlay" onclick="closeTerminal(event)">
+  <div class="sw-terminal" id="terminal-box">
+    <div class="sw-terminal__bar">
+      <span class="sw-terminal__dot sw-terminal__dot--red"></span>
+      <span class="sw-terminal__dot sw-terminal__dot--amber"></span>
+      <span class="sw-terminal__dot sw-terminal__dot--green"></span>
+      <span class="sw-terminal__title">noaa_fetch.py</span>
+    </div>
+    <div class="sw-terminal__body" id="terminal-body"></div>
+  </div>
+</div>
 
 {% endblock %}

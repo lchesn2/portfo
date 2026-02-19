@@ -2,22 +2,94 @@
 {% set title = "Education — Larah" %}
 
 {% block content %}
+<style>
+  /* ── Page header ── */
+  .edu-header { margin-bottom: 2rem; }
+  .edu-header h2 { margin-bottom: 0.15rem; }
+
+  /* ── Degree block ── */
+  .edu-degree {
+    max-width: 680px;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .edu-degree__label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.63rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+  .edu-degree__title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 0.1rem;
+    line-height: 1.2;
+  }
+  .edu-degree__school {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+  .edu-degree__desc {
+    font-size: 0.8rem;
+    color: rgba(27,27,27,0.75);
+    line-height: 1.72;
+    max-width: 58ch;
+  }
+
+  /* ── Certifications ── */
+  .edu-certs-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.63rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+    max-width: 680px;
+  }
+  .edu-cert-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    max-width: 680px;
+  }
+  .edu-cert {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text);
+    background: var(--surface-soft);
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    padding: 0.45rem 0.85rem;
+    transition: border-color 160ms ease, background 160ms ease;
+  }
+  .edu-cert:hover {
+    border-color: var(--moss-mid);
+    background: rgba(89,95,57,0.06);
+  }
+</style>
+
+<div class="edu-header">
   <h2>Education</h2>
+</div>
 
-  <div class="card">
-    <h3>B.S. Computer Science</h3>
-    <div class="meta">Western Governors University • 2021</div>
-    <p class="muted">Bachelor of Science in Information Technology with hands-on training in systems, networking and security,
-  programming, data management, and IT operations, informed by industry best practices.</p>
-  </div>
+<div class="edu-degree">
+  <div class="edu-degree__label">Bachelor of Science · 2021</div>
+  <div class="edu-degree__title">Computer Science</div>
+  <div class="edu-degree__school">Western Governors University</div>
+  <p class="edu-degree__desc">Information Technology with hands-on training in systems, networking and security, programming, data management, and IT operations — informed by industry best practices.</p>
+</div>
 
-  <div class="card">
-    <h3>Certifications (optional)</h3>
-    <ul>
-      <li>ITIL® 4 Foundation Certification</li>
-      <li>Comptia Security+</li>
-      <li>Comptia Network+</li>
-      <li>Comptia Project+</li>
-    </ul>
-  </div>
+<div class="edu-certs-label">Certifications</div>
+<div class="edu-cert-grid">
+  <span class="edu-cert">ITIL 4 Foundation</span>
+  <span class="edu-cert">CompTIA Security+</span>
+  <span class="edu-cert">CompTIA Network+</span>
+  <span class="edu-cert">CompTIA Project+</span>
+</div>
+
 {% endblock %}

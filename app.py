@@ -1,7 +1,7 @@
 """
 app.py — space weather route snippet
 =====================================
-
+Add this to your existing app.py.
 The route reads from the cache file written by space_weather.py.
 If the cache is missing or stale (> 2 hours), it triggers a live fetch.
 """
@@ -73,7 +73,14 @@ def space_refresh():
     try:
         data = fetch_all()
         write_cache(data)
-        return {"ok": True, "fetched_at": data["fetched_at"]}
+        return {
+            "ok":              True,
+            "fetched_at":      data["fetched_at"],
+            "solar_wind_speed": data["solar_wind"].get("speed"),
+            "bz":              data["solar_wind"].get("bz"),
+            "kp":              data["kp"].get("current"),
+            "g_scale":         data["scales"]["G"].get("scale"),
+        }
     except Exception as e:
         app.logger.error("Manual refresh failed: %s", e)
         return {"ok": False, "error": str(e)}, 500
