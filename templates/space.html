@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% set title = "Space Weather — Larah" %}
+
+{% block content %}
+
+<div class="space-header">
+  <div class="space-header__text">
+    <h2>Space Weather Dashboard</h2>
+    <p class="muted">Live data from NOAA's Space Weather Prediction Center — solar wind, geomagnetic storms, aurora activity.</p>
+  </div>
+  <div class="space-badge">
+    <span class="space-badge__dot"></span>
+    <span class="space-badge__label">Live · NOAA SWPC API</span>
+  </div>
+</div>
+
+<!-- Status strip -->
+<div class="sw-status-row">
+  <div class="sw-status-card">
+    <div class="sw-status-label">Geomagnetic Storm</div>
+    <div class="sw-status-value sw-status--green">G0 <span class="sw-status-sub">Quiet</span></div>
+  </div>
+  <div class="sw-status-card">
+    <div class="sw-status-label">Solar Radiation</div>
+    <div class="sw-status-value sw-status--green">S0 <span class="sw-status-sub">None</span></div>
+  </div>
+  <div class="sw-status-card">
+    <div class="sw-status-label">Radio Blackout</div>
+    <div class="sw-status-value sw-status--green">R0 <span class="sw-status-sub">None</span></div>
+  </div>
+  <div class="sw-status-card">
+    <div class="sw-status-label">Aurora Visibility</div>
+    <div class="sw-status-value sw-status--amber">Kp 3 <span class="sw-status-sub">Mid-latitudes</span></div>
+  </div>
+</div>
+
+<!-- Main grid -->
+<div class="sw-grid">
+
+  <!-- Solar Wind panel -->
+  <div class="sw-panel">
+    <div class="sw-panel__header">
+      <span class="sw-panel__icon">☀️</span>
+      <div>
+        <div class="sw-panel__title">Solar Wind</div>
+        <div class="sw-panel__sub">Speed · Density · Bz field</div>
+      </div>
+    </div>
+    <div class="sw-metrics">
+      <div class="sw-metric">
+        <div class="sw-metric__val">428 <span class="sw-metric__unit">km/s</span></div>
+        <div class="sw-metric__label">Wind Speed</div>
+        <div class="sw-bar-track"><div class="sw-bar-fill" style="width:43%; background: var(--moss-mid);"></div></div>
+      </div>
+      <div class="sw-metric">
+        <div class="sw-metric__val">5.2 <span class="sw-metric__unit">p/cm³</span></div>
+        <div class="sw-metric__label">Density</div>
+        <div class="sw-bar-track"><div class="sw-bar-fill" style="width:26%; background: var(--moss-mid);"></div></div>
+      </div>
+      <div class="sw-metric">
+        <div class="sw-metric__val">−3.1 <span class="sw-metric__unit">nT</span></div>
+        <div class="sw-metric__label">Bz (IMF)</div>
+        <div class="sw-bar-track"><div class="sw-bar-fill" style="width:31%; background: #c8a400;"></div></div>
+      </div>
+    </div>
+    <div class="sw-chart-placeholder">
+      <svg viewBox="0 0 280 60" class="sw-sparkline">
+        <polyline points="0,45 20,40 40,38 60,42 80,35 100,30 120,33 140,28 160,32 180,25 200,30 220,26 240,22 260,28 280,24"
+          fill="none" stroke="var(--moss-mid)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="0,45 20,40 40,38 60,42 80,35 100,30 120,33 140,28 160,32 180,25 200,30 220,26 240,22 260,28 280,24"
+          fill="url(#sw-grad)" stroke="none" opacity="0.15"/>
+        <defs>
+          <linearGradient id="sw-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--moss-mid)"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="sw-chart-label">24h solar wind speed trend</div>
+    </div>
+  </div>
+
+  <!-- Kp Index / Aurora panel -->
+  <div class="sw-panel">
+    <div class="sw-panel__header">
+      <span class="sw-panel__icon">🌌</span>
+      <div>
+        <div class="sw-panel__title">Kp Index</div>
+        <div class="sw-panel__sub">Planetary geomagnetic activity</div>
+      </div>
+    </div>
+    <!-- <div class="sw-kp-scale">
+      {% for i in range(1, 10) %}
+      <div class="sw-kp-bar {% if i <= 3 %}sw-kp--active{% endif %}"
+           style="height: {{ 20 + i * 8 }}px;"
+           title="Kp {{ i }}">
+        <span class="sw-kp-num">{{ i }}</span>
+      </div>
+      {% endfor %}
+    </div> -->
+    <div class="sw-kp-legend">
+      <span class="sw-kp-legend-item sw-kp-legend--green">● G0–G1 Quiet</span>
+      <span class="sw-kp-legend-item sw-kp-legend--amber">● G2–G3 Active</span>
+      <span class="sw-kp-legend-item sw-kp-legend--red">● G4–G5 Storm</span>
+    </div>
+    <div class="sw-aurora-note">
+      <span class="sw-aurora-dot"></span>
+      Aurora currently visible above ~60° latitude
+    </div>
+  </div>
+
+  <!-- 3-day Forecast panel -->
+  <div class="sw-panel sw-panel--wide">
+    <div class="sw-panel__header">
+      <span class="sw-panel__icon">📡</span>
+      <div>
+        <div class="sw-panel__title">3-Day Forecast</div>
+        <div class="sw-panel__sub">NOAA SWPC outlook</div>
+      </div>
+    </div>
+    <div class="sw-forecast-grid">
+      <div class="sw-forecast-day">
+        <div class="sw-forecast-date">Today</div>
+        <div class="sw-forecast-row">
+          <span class="sw-forecast-type">Geomagnetic</span>
+          <span class="sw-pill sw-pill--green">G0 — 95%</span>
+        </div>
+        <div class="sw-forecast-row">
+          <span class="sw-forecast-type">Solar Radiation</span>
+          <span class="sw-pill sw-pill--green">S0 — 99%</span>
+        </div>
+        <div class="sw-forecast-row">
+          <span class="sw-forecast-type">Radio Blackout</span>
+          <span class="sw-pill sw-pill--green">R0 — 90%</span>
+        </div>
+      </div>
+      <div class="sw-forecast-day">
+        <div class="sw-forecast-date">Tomorrow</div>
+        <div class="sw-forecast-row">
+          <span class="sw-forecast-type">Geomagnetic</span>
+          <span class="sw-pill sw-pill--amber">G1 — 20%</span>
+        </div>
+        <div class="sw-forecast-row">
+          <span class="sw-forecast-type">Solar Radiation</span>
+          <span class="sw-pill sw-pill--green">S0 — 99%</span>
+        </div>
+        <div class="sw-forecast-row">
+          <span class="sw-forecast-type">Radio Blackout</span>
+          <span class="sw-pill sw-pill--amber">R1 — 15%</span>
+        </div>
+      </div>
+      <div class="sw-forecast-day">
+        <div class="sw-forecast-date">+2 Days</div>
+        <div class="sw-forecast-row">
+          <span class="sw-forecast-type">Geomagnetic</span>
+          <span class="sw-pill sw-pill--amber">G1 — 25%</span>
+        </div>
+        <div class="sw-forecast-row">
+          <span class="sw-forecast-type">Solar Radiation</span>
+          <span class="sw-pill sw-pill--green">S0 — 98%</span>
+        </div>
+        <div class="sw-forecast-row">
+          <span class="sw-forecast-type">Radio Blackout</span>
+          <span class="sw-pill sw-pill--green">R0 — 88%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Coming soon note -->
+<div class="sw-coming-soon">
+  <div class="sw-coming-soon__inner">
+    <span class="sw-coming-soon__icon">🚧</span>
+    <div>
+      <div class="sw-coming-soon__title">Live API integration in progress</div>
+      <div class="sw-coming-soon__text">This dashboard will pull real-time data from the NOAA SWPC API — solar wind, Kp index, storm alerts, and aurora forecasts — on a scheduled refresh. Currently showing placeholder data.</div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

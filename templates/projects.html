@@ -2,35 +2,238 @@
 {% set title = "Projects — Larah" %}
 
 {% block content %}
+
+<div class="projects-header">
   <h2>Projects</h2>
-  <p class="muted">A few things I’ve built.</p>
+  <p class="muted">A few things I've built.</p>
+</div>
 
-  <div class="grid">
-    <article class="card">
-      <h3>SharePoint → Delta Lake Ingestion</h3>
-      <p>API-based ingestion with Delta MERGE for dedupe + updates, plus parameterized reprocessing.</p>
-      <div class="meta">Databricks • Delta • APIs • Python</div>
-    </article>
+<div class="project-list">
 
-    <article class="card">
-      <h3>Legacy App Extraction + Historical Reporting</h3>
-      <p>Mapped JSON APIs into curated tables; enabled historical analysis and attachment discovery.</p>
-      <div class="meta">SQL • Delta Lake • Tableau • SharePoint</div>
-    </article>
-
-    <article class="card">
-      <h3>Analytics Portal</h3>
-      <p>Angular hub that consolidates many dashboards into one place with exports and navigation.</p>
-      <div class="meta">Angular • FastAPI • Tableau</div>
-    </article>
-    <article class="card">
-        <h3>Cap Stone</h3>
-        <p>
-          Built a k-nearest neighbors machine learning model to predict kidney disease, performing data cleaning,
-          feature analysis, and model evaluation to achieve ~75% accuracy.
-        </p>
-        <div class="meta">Pandas • Scikit-Learn • Matplotlib</div>
-
-    </article>
+  <!-- 1. SharePoint → Delta Lake -->
+  <div>
+    <button class="proj-btn" onclick="toggle(this,'p0')">
+      <div>
+        <div class="proj-name">SharePoint → Delta Lake Ingestion</div>
+        <div class="proj-stack">Databricks · Delta · APIs · Python</div>
+      </div>
+      <span class="proj-plus">+</span>
+    </button>
+    <div class="popout" id="p0">
+      <div class="popout-text">
+        <p>CSV reports arrive by email, get auto-uploaded to SharePoint by a Power Automate flow with a timestamp in the filename. A daily Databricks job filters files by that timestamp, downloads each one into a DataFrame, transforms it, and merges into Delta Lake on a composite key — handling deduplication and updates in one step. Date window is overrideable via job params.</p>
+      </div>
+      <div class="mini-viz">
+        <div class="flow-diagram">
+          <div class="flow-node">
+            <div class="flow-icon ic-email">📧</div>
+            <div>
+              <div class="flow-node-name">Email Inbox</div>
+              <div class="flow-node-sub">CSV report arrives</div>
+            </div>
+          </div>
+          <div class="flow-connector"><div class="flow-connector-dot"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon ic-pa">⚡</div>
+            <div>
+              <div class="flow-node-name">Power Automate</div>
+              <div class="flow-node-sub">Subject + attachment filter</div>
+            </div>
+          </div>
+          <div class="flow-connector"><div class="flow-connector-dot"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon ic-sp">📂</div>
+            <div>
+              <div class="flow-node-name">SharePoint</div>
+              <div class="flow-node-sub">Timestamped file landing</div>
+            </div>
+          </div>
+          <div class="flow-connector"><div class="flow-connector-dot"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon ic-db">🔷</div>
+            <div>
+              <div class="flow-node-name">Databricks Job</div>
+              <div class="flow-node-sub">Filter · Extract · Transform</div>
+            </div>
+          </div>
+          <div class="flow-connector"><div class="flow-connector-dot"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon ic-delta">🏔️</div>
+            <div>
+              <div class="flow-node-name">Delta Lake</div>
+              <div class="flow-node-sub">MERGE on composite key</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- 2. Legacy App Extraction -->
+  <div>
+    <button class="proj-btn" onclick="toggle(this,'p1')">
+      <div>
+        <div class="proj-name">Legacy App Extraction + Historical Reporting</div>
+        <div class="proj-stack">SQL · Delta Lake · Tableau · SharePoint</div>
+      </div>
+      <span class="proj-plus">+</span>
+    </button>
+    <div class="popout" id="p1">
+      <div class="popout-text">
+        <p>Architected dual-API ingestion pipeline to migrate legacy structured data into Delta tables and transform unstructured byte streams (emails/images) into managed object storage, preserving relational mappings. Delivered Tableau analytics layer and automated SharePoint uploads via AWS CLI.</p>
+      </div>
+      <div class="mini-viz">
+        <div class="flow-diagram">
+          <div class="flow-node">
+            <div class="flow-icon ic-legacy">🔌</div>
+            <div>
+              <div class="flow-node-name">JSON API</div>
+              <div class="flow-node-sub">Undocumented endpoints</div>
+            </div>
+          </div>
+          <div class="flow-connector"><div class="flow-connector-dot"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon ic-py">🐍</div>
+            <div>
+              <div class="flow-node-name">Python</div>
+              <div class="flow-node-sub">Map · Clean · Curate</div>
+            </div>
+          </div>
+          <div class="flow-connector"><div class="flow-connector-dot"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon ic-delta">🏔️</div>
+            <div>
+              <div class="flow-node-name">Delta Lake</div>
+              <div class="flow-node-sub">Curated tables + history</div>
+            </div>
+          </div>
+          <div class="flow-connector"><div class="flow-connector-dot"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon ic-tableau">📊</div>
+            <div>
+              <div class="flow-node-name">Tableau</div>
+              <div class="flow-node-sub">Historical dashboards</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Analytics Portal -->
+  <div>
+    <button class="proj-btn" onclick="toggle(this,'p2')">
+      <div>
+        <div class="proj-name">Analytics Portal</div>
+        <div class="proj-stack">Angular · FastAPI · Databricks</div>
+      </div>
+      <span class="proj-plus">+</span>
+    </button>
+    <div class="popout" id="p2">
+      <div class="popout-text">
+        <p>Engineered a dynamic data model and FastAPI backend that reduced 18 complex reporting queries to two parameterized endpoints, enabling a streamlined Angular KPI hub with drill-down capabilities and unified Tableau integration.</p>
+      </div>
+      <div class="mini-viz">
+        <div class="flow-diagram">
+          <div class="flow-node">
+            <div class="flow-icon ic-angular">🅰️</div>
+            <div>
+              <div class="flow-node-name">Angular</div>
+              <div class="flow-node-sub">Angular Material UI</div>
+            </div>
+          </div>
+          <div class="flow-connector"><div class="flow-connector-dot"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon ic-fastapi">⚡</div>
+            <div>
+              <div class="flow-node-name">FastAPI</div>
+              <div class="flow-node-sub">Auth · Routing · API layer</div>
+            </div>
+          </div>
+          <div class="flow-connector"><div class="flow-connector-dot"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon ic-db">🔷</div>
+            <div>
+              <div class="flow-node-name">Data Model</div>
+              <div class="flow-node-sub">6 tables → 2 endpoints</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Capstone -->
+  <div>
+    <button class="proj-btn" onclick="toggle(this,'p3')">
+      <div>
+        <div class="proj-name">Capstone — Kidney Disease Predictor</div>
+        <div class="proj-stack">Pandas · Scikit-Learn · Matplotlib</div>
+      </div>
+      <span class="proj-plus">+</span>
+    </button>
+    <div class="popout" id="p3">
+      <div class="popout-text">
+        <p>Implemented and evaluated a k-nearest neighbors classifier for chronic kidney disease prediction as part of a supervised learning project, focusing on data preprocessing and model validation.</p>
+      </div>
+      <div class="mini-viz">
+        <div class="flow-diagram">
+          <div class="flow-node">
+            <div class="flow-icon ic-py">🐍</div>
+            <div>
+              <div class="flow-node-name">Pandas</div>
+              <div class="flow-node-sub">Clean · Feature analysis</div>
+            </div>
+          </div>
+          <div class="flow-connector"><div class="flow-connector-dot"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon ic-sklearn">🤖</div>
+            <div>
+              <div class="flow-node-name">KNN Model</div>
+              <div class="flow-node-sub">Scikit-Learn · k tuning</div>
+            </div>
+          </div>
+          <div class="flow-connector"><div class="flow-connector-dot"></div></div>
+          <div class="flow-node">
+            <div class="flow-icon ic-tableau">📈</div>
+            <div>
+              <div class="flow-node-name">Matplotlib</div>
+              <div class="flow-node-sub">Evaluation + results viz</div>
+            </div>
+          </div>
+        </div>
+        <div class="acc-wrap" id="acc-wrap" style="display:none;">
+          <div class="acc-label">Model Accuracy</div>
+          <div class="acc-track"><div class="acc-fill" id="acc-fill"></div></div>
+          <div class="acc-pct">~75%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggle(btn, id) {
+    const popout = document.getElementById(id);
+    const isOpen = btn.classList.contains('open');
+
+    document.querySelectorAll('.proj-btn').forEach(b => b.classList.remove('open'));
+    document.querySelectorAll('.popout').forEach(p => p.classList.remove('show'));
+
+    if (!isOpen) {
+      btn.classList.add('open');
+      popout.classList.add('show');
+
+      if (id === 'p3') {
+        const wrap = document.getElementById('acc-wrap');
+        const fill = document.getElementById('acc-fill');
+        wrap.style.display = 'block';
+        fill.style.width = '0';
+        requestAnimationFrame(() => setTimeout(() => fill.style.width = '75%', 80));
+      }
+    }
+  }
+</script>
+
 {% endblock %}
