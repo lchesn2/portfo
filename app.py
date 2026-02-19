@@ -1,38 +1,26 @@
-from flask import Flask, render_template, url_for,request, redirect
-import csv
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
+@app.route("/")
+def home():
+    return render_template("home.html")
 
-@app.route('/')
-def my_home():
-	return render_template('index.html')
+@app.route("/about")
+def about():
+    return render_template("about.html")
 
-@app.route('/<string:page_name>')
-def html_page(page_name):
-	return render_template(page_name)
+@app.route("/projects")
+def projects():
+    return render_template("projects.html")
 
-def write_to_csv(data):
-	with open('database.csv', newline='',mode='a') as database:
-		
-		name = data['name']
-		email = data['email']
-		msg = data['message']
-		csv_writer = csv.writer(database, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-		csv_writer.writerow([name,email,msg])
-		print(msg)
+@app.route("/education")
+def education():
+    return render_template("education.html")
 
+@app.route("/work")
+def work():
+    return render_template("work.html")
 
-
-
-@app.route('/submit_form', methods=['POST', 'GET'])
-def submit_form():
-	if request.method == 'POST':
-		try:
-			data = request.form.to_dict()
-			write_to_csv(data)
-			return redirect('/index.html')
-		except:
-			print("Database Error")
-	else:
-		return 'Something went wrong'
+if __name__ == "__main__":
+    app.run(debug=True)

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% set title = "Projects — Larah" %}
+
+{% block content %}
+  <h2>Projects</h2>
+  <p class="muted">A few things I’ve built.</p>
+
+  <div class="grid">
+    <article class="card">
+      <h3>SharePoint → Delta Lake Ingestion</h3>
+      <p>API-based ingestion with Delta MERGE for dedupe + updates, plus parameterized reprocessing.</p>
+      <div class="meta">Databricks • Delta • APIs • Python</div>
+    </article>
+
+    <article class="card">
+      <h3>Legacy App Extraction + Historical Reporting</h3>
+      <p>Mapped JSON APIs into curated tables; enabled historical analysis and attachment discovery.</p>
+      <div class="meta">SQL • Delta Lake • Tableau • SharePoint</div>
+    </article>
+
+    <article class="card">
+      <h3>Analytics Portal</h3>
+      <p>Angular hub that consolidates many dashboards into one place with exports and navigation.</p>
+      <div class="meta">Angular • FastAPI • Tableau</div>
+    </article>
+    <article class="card">
+        <h3>Cap Stone</h3>
+        <p>
+          Built a k-nearest neighbors machine learning model to predict kidney disease, performing data cleaning,
+          feature analysis, and model evaluation to achieve ~75% accuracy.
+        </p>
+        <div class="meta">Pandas • Scikit-Learn • Matplotlib</div>
+
+    </article>
+  </div>
+{% endblock %}

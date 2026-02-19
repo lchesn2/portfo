@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% set title = "Work — Larah" %}
+
+{% block content %}
+  <h2>Work History</h2>
+  <p class="muted"></p>
+
+  <div class="stack">
+    <section class="card">
+      <div class="role">
+        <div>
+          <h3>BI / Data Engineer</h3>
+          <div class="meta">ADP • 2024-Present • CA</div>
+        </div>
+        <span class="pill">Sr. Software Engineer</span>
+      </div>
+      <ul>
+        <li>Led migration of ETL workflows from a legacy platform to a modern data stack, overseeing three critical pipelines and ensuring offshore implementations met design, quality, and performance standards.</li>
+        <li>Served as primary owner for enhancements, defect resolution, and production readiness during migration, acting as the escalation point for data, logic, and system concerns.</li>
+        <li>Optimized SQL logic and data storage patterns, reducing storage footprint by approximately 75% for a key datastore while maintaining data integrity and performance</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <div class="role">
+        <div>
+          <h3>BI Developer</h3>
+          <div class="meta">Apple With Infosys • 2021-2024 • CA</div>
+        </div>
+      </div>
+      <ul>
+        <li>Served as onshore technical lead responsible for requirements gathering, solution design, and delivery, coordinating and mentoring two offshore developers through clear task breakdowns, documentation, and timelines.</li>
+        <li>Led modernization of an outdated web application into a Tableau dashboard by mapping backend data sources into a unified analytical dataset with drill-down and roll-up capabilities.</li>
+        <li>Diagnosed and corrected flawed joins and data logic that caused reporting inaccuracies, resulting in a secure, production-ready Tableau dashboard aligned with business expectations.</li>
+      </ul>
+    </section>
+  </div>
+{% endblock %}

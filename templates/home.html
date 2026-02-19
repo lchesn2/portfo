@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% set title = "Home — Larah" %}
+
+{% block content %}
+  <div class="hero">
+  <img src="{{ url_for('static', filename='img/IMG_2.png') }}"
+       alt="Professional headshot"
+       class="headshot">
+  <div>
+    <h1>Larah</h1>
+    <p class="muted">BI Engineer • Data Engineer • Analytics Engineer</p>
+  </div>
+</div>
+
+  <h1>Connecting people, systems, and data so teams can build together.</h1>
+  <p class="muted" style="max-width:70ch;">
+    I build trusted datasets, clean pipelines, and dashboards/apps that help teams make decisions faster—without
+    sacrificing data quality.
+  </p>
+
+  <div class="actions">
+    <a class="btn btn--primary" href="{{ url_for('projects') }}">View Projects</a>
+    <a class="btn btn--ghost" href="{{ url_for('about') }}">About Me</a>
+  </div>
+
+  <div class="grid" style="margin-top:18px;">
+    <div class="card">
+      <h3>Data Engineering</h3>
+      <p class="muted">Delta Lake, Airflow/Databricks orchestration, API-based ingestion, quality processing.</p>
+      <div class="meta">Databricks • SQL • Python • Angular</div>
+    </div>
+    <div class="card">
+      <h3>BI & Analytics</h3>
+      <p class="muted">KPIs and Tableau dashboards built on scalable datasets</p>
+      <div class="meta">Tableau • Modeling • Data Quality</div>
+    </div>
+  </div>
+{% endblock %}

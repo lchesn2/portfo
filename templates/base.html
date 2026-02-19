@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title if title else "Larah" }}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="{{ url_for('home') }}">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__text">Larah</span>
+      </a>
+
+      <nav class="nav" aria-label="Primary">
+        <a class="nav__link" href="{{ url_for('about') }}">About</a>
+        <a class="nav__link" href="{{ url_for('projects') }}">Projects</a>
+        <a class="nav__link" href="{{ url_for('education') }}">Education</a>
+        <a class="nav__link" href="{{ url_for('work') }}">Work</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main">
+    <div class="shell">
+      {% block content %}{% endblock %}
+    </div>
+
+    <footer class="footer">
+      <span>© {{ 2026 }} Larah</span>
+      <span class="dot">•</span>
+      <a href="mailto:you@email.com">larah.chesnic@gmail.com</a>
+      <span class="dot">•</span>
+      <a href="https://yourwebsite.com" target="_blank" rel="noreferrer">larahrc@pythonanywhere.com</a>
+    </footer>
+  </main>
+</body>
+</html>
