@@ -6,9 +6,7 @@ app = Flask(__name__)
 def home():
     return render_template("home.html")
 
-@app.route("/about")
-def about():
-    return render_template("about.html")
+
 
 @app.route("/projects")
 def projects():
@@ -22,5 +20,8 @@ def education():
 def work():
     return render_template("work.html")
 
+@app.route('/space')
+def space():
+    return render_template('space.html')
 if __name__ == "__main__":
     app.run(debug=True)
