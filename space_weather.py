@@ -52,7 +52,7 @@ ENDPOINTS = {
 
 # ── Fetch helpers ───────────────────────────────────────────────────────────
 
-def fetch_json(url: str) -> list | dict | None:
+def fetch_json(url: str):
     """Fetch a NOAA JSON endpoint. Returns parsed data or None on failure."""
     try:
         resp = requests.get(url, timeout=REQUEST_TIMEOUT)
@@ -234,7 +234,7 @@ def parse_alerts(alerts_raw: list) -> list:
     return alerts
 
 
-def aurora_visibility(kp: float | None) -> dict:
+def aurora_visibility(kp) -> dict:
     """
     Map Kp index to aurora visibility description.
     Based on NOAA's own Kp → latitude table.
@@ -305,7 +305,7 @@ def write_cache(payload: dict) -> None:
     log.info("Cache written → %s", CACHE_FILE)
 
 
-def load_cache() -> dict | None:
+def load_cache():
     """Read cache file. Returns None if missing or malformed."""
     if not CACHE_FILE.exists():
         return None
