@@ -8,9 +8,20 @@
     <h2>Space Weather Dashboard</h2>
     <p class="muted">Live data from NOAA's Space Weather Prediction Center — solar wind, geomagnetic storms, aurora activity.</p>
   </div>
-  <div class="space-badge">
-    <span class="space-badge__dot"></span>
-    <span class="space-badge__label">Live · NOAA SWPC API</span>
+  <div class="space-header__right">
+    <div class="space-badge">
+      <span class="space-badge__dot" id="badge-dot"></span>
+      <span class="space-badge__label" id="badge-label">
+        {% if sw.fetched_at %}
+          Updated {{ sw.fetched_at[:16] | replace("T", " ") }} UTC
+        {% else %}
+          NOAA SWPC API
+        {% endif %}
+      </span>
+    </div>
+    <button class="sw-refresh-btn" id="refresh-btn" onclick="refreshData()">
+      &#8635; Refresh
+    </button>
   </div>
 </div>
 
@@ -18,19 +29,30 @@
 <div class="sw-status-row">
   <div class="sw-status-card">
     <div class="sw-status-label">Geomagnetic Storm</div>
-    <div class="sw-status-value sw-status--green">G0 <span class="sw-status-sub">Quiet</span></div>
+    <div class="sw-status-value {{ 'sw-status--green' if sw.scales.G.scale in ['G0','—'] else 'sw-status--amber' if sw.scales.G.scale in ['G1','G2'] else 'sw-status--red' }}">
+      {{ sw.scales.G.scale }} <span class="sw-status-sub">{{ sw.scales.G.label }}</span>
+    </div>
   </div>
   <div class="sw-status-card">
     <div class="sw-status-label">Solar Radiation</div>
-    <div class="sw-status-value sw-status--green">S0 <span class="sw-status-sub">None</span></div>
+    <div class="sw-status-value {{ 'sw-status--green' if sw.scales.S.scale in ['S0','—'] else 'sw-status--amber' if sw.scales.S.scale in ['S1','S2'] else 'sw-status--red' }}">
+      {{ sw.scales.S.scale }} <span class="sw-status-sub">{{ sw.scales.S.label }}</span>
+    </div>
   </div>
   <div class="sw-status-card">
     <div class="sw-status-label">Radio Blackout</div>
-    <div class="sw-status-value sw-status--green">R0 <span class="sw-status-sub">None</span></div>
+    <div class="sw-status-value {{ 'sw-status--green' if sw.scales.R.scale in ['R0','—'] else 'sw-status--amber' if sw.scales.R.scale in ['R1','R2'] else 'sw-status--red' }}">
+      {{ sw.scales.R.scale }} <span class="sw-status-sub">{{ sw.scales.R.label }}</span>
+    </div>
   </div>
   <div class="sw-status-card">
     <div class="sw-status-label">Aurora Visibility</div>
-    <div class="sw-status-value sw-status--amber">Kp 3 <span class="sw-status-sub">Mid-latitudes</span></div>
+    <div class="sw-status-value {{ 'sw-status--green' if sw.kp.current is none or sw.kp.current < 3 else 'sw-status--amber' if sw.kp.current < 6 else 'sw-status--red' }}">
+      {% if sw.kp.current is not none %}
+        Kp {{ sw.kp.current | round(1) }}
+      {% else %}—{% endif %}
+      <span class="sw-status-sub">{{ sw.aurora.label }}</span>
+    </div>
   </div>
 </div>
 
@@ -43,41 +65,80 @@
       <span class="sw-panel__icon">☀️</span>
       <div>
         <div class="sw-panel__title">Solar Wind</div>
-        <div class="sw-panel__sub">Speed · Density · Bz field</div>
+        <div class="sw-panel__sub">Speed · Density · Bz field (DSCOVR)</div>
       </div>
     </div>
     <div class="sw-metrics">
+
+      <!-- Speed -->
       <div class="sw-metric">
-        <div class="sw-metric__val">428 <span class="sw-metric__unit">km/s</span></div>
+        <div class="sw-metric__val">
+          {% if sw.solar_wind.speed is not none %}
+            {{ sw.solar_wind.speed | int }} <span class="sw-metric__unit">km/s</span>
+          {% else %}<span class="sw-metric__unit">—</span>{% endif %}
+        </div>
         <div class="sw-metric__label">Wind Speed</div>
-        <div class="sw-bar-track"><div class="sw-bar-fill" style="width:43%; background: var(--moss-mid);"></div></div>
+        {% if sw.solar_wind.speed is not none %}
+          {% set speed_pct = ((sw.solar_wind.speed / 800) * 100) | int %}
+          {% set speed_pct = 100 if speed_pct > 100 else speed_pct %}
+          <div class="sw-bar-track">
+            <div class="sw-bar-fill" style="width: {{ speed_pct }}%; background: var(--moss-mid);"></div>
+          </div>
+        {% endif %}
       </div>
+
+      <!-- Density -->
       <div class="sw-metric">
-        <div class="sw-metric__val">5.2 <span class="sw-metric__unit">p/cm³</span></div>
+        <div class="sw-metric__val">
+          {% if sw.solar_wind.density is not none %}
+            {{ sw.solar_wind.density }} <span class="sw-metric__unit">p/cm³</span>
+          {% else %}<span class="sw-metric__unit">—</span>{% endif %}
+        </div>
         <div class="sw-metric__label">Density</div>
-        <div class="sw-bar-track"><div class="sw-bar-fill" style="width:26%; background: var(--moss-mid);"></div></div>
+        {% if sw.solar_wind.density is not none %}
+          {% set density_pct = ((sw.solar_wind.density / 50) * 100) | int %}
+          {% set density_pct = 100 if density_pct > 100 else density_pct %}
+          <div class="sw-bar-track">
+            <div class="sw-bar-fill" style="width: {{ density_pct }}%; background: var(--moss-mid);"></div>
+          </div>
+        {% endif %}
       </div>
+
+      <!-- Bz -->
       <div class="sw-metric">
-        <div class="sw-metric__val">−3.1 <span class="sw-metric__unit">nT</span></div>
-        <div class="sw-metric__label">Bz (IMF)</div>
-        <div class="sw-bar-track"><div class="sw-bar-fill" style="width:31%; background: #c8a400;"></div></div>
+        <div class="sw-metric__val">
+          {% if sw.solar_wind.bz is not none %}
+            {{ sw.solar_wind.bz }} <span class="sw-metric__unit">nT</span>
+          {% else %}<span class="sw-metric__unit">—</span>{% endif %}
+        </div>
+        <div class="sw-metric__label">Bz (IMF) — negative = storm risk</div>
+        {% if sw.solar_wind.bz is not none %}
+          {% set bz_mag = sw.solar_wind.bz if sw.solar_wind.bz >= 0 else sw.solar_wind.bz * -1 %}
+          {% set bz_pct = ((bz_mag / 30) * 100) | int %}
+          {% set bz_pct = 100 if bz_pct > 100 else bz_pct %}
+          {% set bz_color = '#9a6e00' if sw.solar_wind.bz < -10 else 'var(--moss-mid)' %}
+          <div class="sw-bar-track">
+            <div class="sw-bar-fill" style="width: {{ bz_pct }}%; background: {{ bz_color }};"></div>
+          </div>
+        {% endif %}
       </div>
+
     </div>
+
+    <!-- Sparkline: Kp history trend -->
+    {% if sw.kp.history and sw.kp.history | length > 1 %}
     <div class="sw-chart-placeholder">
+      {% set pts = sw.kp.history %}
+      {% set pt_count = pts | length %}
       <svg viewBox="0 0 280 60" class="sw-sparkline">
-        <polyline points="0,45 20,40 40,38 60,42 80,35 100,30 120,33 140,28 160,32 180,25 200,30 220,26 240,22 260,28 280,24"
-          fill="none" stroke="var(--moss-mid)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        <polyline points="0,45 20,40 40,38 60,42 80,35 100,30 120,33 140,28 160,32 180,25 200,30 220,26 240,22 260,28 280,24"
-          fill="url(#sw-grad)" stroke="none" opacity="0.15"/>
-        <defs>
-          <linearGradient id="sw-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="var(--moss-mid)"/>
-            <stop offset="100%" stop-color="transparent"/>
-          </linearGradient>
-        </defs>
+        <polyline
+          points="{% for pt in pts %}{{ ((loop.index0 / (pt_count - 1)) * 280) | int }},{{ (60 - (pt.kp / 9 * 50)) | int }} {% endfor %}"
+          fill="none" stroke="var(--moss-mid)" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <div class="sw-chart-label">24h solar wind speed trend</div>
+      <div class="sw-chart-label">recent Kp index trend</div>
     </div>
+    {% endif %}
   </div>
 
   <!-- Kp Index / Aurora panel -->
@@ -89,15 +150,16 @@
         <div class="sw-panel__sub">Planetary geomagnetic activity</div>
       </div>
     </div>
-    <!-- <div class="sw-kp-scale">
+    <div class="sw-kp-scale">
+      {% set current_kp = sw.kp.current if sw.kp.current is not none else 0 %}
       {% for i in range(1, 10) %}
-      <div class="sw-kp-bar {% if i <= 3 %}sw-kp--active{% endif %}"
-           style="height: {{ 20 + i * 8 }}px;"
-           title="Kp {{ i }}">
-        <span class="sw-kp-num">{{ i }}</span>
-      </div>
+        <div class="sw-kp-bar {% if i <= current_kp %}sw-kp--active{% endif %}"
+             style="height: {{ 20 + i * 8 }}px;"
+             title="Kp {{ i }}">
+          <span class="sw-kp-num">{{ i }}</span>
+        </div>
       {% endfor %}
-    </div> -->
+    </div>
     <div class="sw-kp-legend">
       <span class="sw-kp-legend-item sw-kp-legend--green">● G0–G1 Quiet</span>
       <span class="sw-kp-legend-item sw-kp-legend--amber">● G2–G3 Active</span>
@@ -105,79 +167,84 @@
     </div>
     <div class="sw-aurora-note">
       <span class="sw-aurora-dot"></span>
-      Aurora currently visible above ~60° latitude
+      {{ sw.aurora.label }}
     </div>
   </div>
 
-  <!-- 3-day Forecast panel -->
+
+  <!-- Alerts panel -->
   <div class="sw-panel sw-panel--wide">
     <div class="sw-panel__header">
       <span class="sw-panel__icon">📡</span>
       <div>
-        <div class="sw-panel__title">3-Day Forecast</div>
-        <div class="sw-panel__sub">NOAA SWPC outlook</div>
+        <div class="sw-panel__title">Active Alerts</div>
+        <div class="sw-panel__sub">NOAA SWPC warnings & watches</div>
       </div>
     </div>
-    <div class="sw-forecast-grid">
-      <div class="sw-forecast-day">
-        <div class="sw-forecast-date">Today</div>
-        <div class="sw-forecast-row">
-          <span class="sw-forecast-type">Geomagnetic</span>
-          <span class="sw-pill sw-pill--green">G0 — 95%</span>
+    {% if sw.alerts %}
+      <div class="sw-alerts-list">
+        {% for alert in sw.alerts %}
+        <div class="sw-alert-item">
+          <div class="sw-alert-meta">
+            <span class="sw-pill {{ 'sw-pill--amber' if 'WARNING' in alert.headline else 'sw-pill--red' if 'WATCH' in alert.headline else 'sw-pill--green' }}">
+              {{ alert.product_id | replace('_', ' ') }}
+            </span>
+            <span class="sw-alert-time">
+              {% if alert.issue_time %}{{ alert.issue_time[:16] | replace("T", " ") }} UTC{% endif %}
+            </span>
+          </div>
+          <div class="sw-alert-headline">{{ alert.headline }}</div>
+          {% if alert.impacts %}
+          <div class="sw-alert-impacts">⚡ {{ alert.impacts }}</div>
+          {% endif %}
         </div>
-        <div class="sw-forecast-row">
-          <span class="sw-forecast-type">Solar Radiation</span>
-          <span class="sw-pill sw-pill--green">S0 — 99%</span>
-        </div>
-        <div class="sw-forecast-row">
-          <span class="sw-forecast-type">Radio Blackout</span>
-          <span class="sw-pill sw-pill--green">R0 — 90%</span>
-        </div>
+        {% endfor %}
       </div>
-      <div class="sw-forecast-day">
-        <div class="sw-forecast-date">Tomorrow</div>
-        <div class="sw-forecast-row">
-          <span class="sw-forecast-type">Geomagnetic</span>
-          <span class="sw-pill sw-pill--amber">G1 — 20%</span>
-        </div>
-        <div class="sw-forecast-row">
-          <span class="sw-forecast-type">Solar Radiation</span>
-          <span class="sw-pill sw-pill--green">S0 — 99%</span>
-        </div>
-        <div class="sw-forecast-row">
-          <span class="sw-forecast-type">Radio Blackout</span>
-          <span class="sw-pill sw-pill--amber">R1 — 15%</span>
-        </div>
+    {% else %}
+      <div class="sw-aurora-note" style="margin-top:0;">
+        <span class="sw-aurora-dot" style="background:var(--moss-mid);"></span>
+        No active alerts — conditions are quiet.
       </div>
-      <div class="sw-forecast-day">
-        <div class="sw-forecast-date">+2 Days</div>
-        <div class="sw-forecast-row">
-          <span class="sw-forecast-type">Geomagnetic</span>
-          <span class="sw-pill sw-pill--amber">G1 — 25%</span>
-        </div>
-        <div class="sw-forecast-row">
-          <span class="sw-forecast-type">Solar Radiation</span>
-          <span class="sw-pill sw-pill--green">S0 — 98%</span>
-        </div>
-        <div class="sw-forecast-row">
-          <span class="sw-forecast-type">Radio Blackout</span>
-          <span class="sw-pill sw-pill--green">R0 — 88%</span>
-        </div>
-      </div>
-    </div>
+    {% endif %}
   </div>
 
 </div>
 
-<!-- Coming soon note -->
-<div class="sw-coming-soon">
-  <div class="sw-coming-soon__inner">
-    <span class="sw-coming-soon__icon">🚧</span>
-    <div>
-      <div class="sw-coming-soon__title">Live API integration in progress</div>
-      <div class="sw-coming-soon__text">This dashboard will pull real-time data from the NOAA SWPC API — solar wind, Kp index, storm alerts, and aurora forecasts — on a scheduled refresh. Currently showing placeholder data.</div>
-    </div>
-  </div>
-</div>
+
+<script>
+async function refreshData() {
+  const btn   = document.getElementById('refresh-btn');
+  const label = document.getElementById('badge-label');
+  const dot   = document.getElementById('badge-dot');
+
+  btn.disabled    = true;
+  btn.textContent = '⏳ Fetching...';
+  dot.style.background = '#c8a400';
+
+  try {
+    const res  = await fetch('/space/refresh', { method: 'POST' });
+    const data = await res.json();
+
+    if (data.ok) {
+      const ts = data.fetched_at ? data.fetched_at.substring(0, 16).replace('T', ' ') + ' UTC' : 'just now';
+      label.textContent    = 'Updated ' + ts;
+      dot.style.background = '';
+      btn.textContent      = '✓ Done';
+      // Reload after short delay so all panels update with fresh data
+      setTimeout(() => window.location.reload(), 800);
+    } else {
+      label.textContent    = 'Refresh failed';
+      dot.style.background = '#b83232';
+      btn.disabled         = false;
+      btn.textContent      = '↻ Retry';
+    }
+  } catch (e) {
+    label.textContent    = 'Network error';
+    dot.style.background = '#b83232';
+    btn.disabled         = false;
+    btn.textContent      = '↻ Retry';
+  }
+}
+</script>
 
 {% endblock %}
