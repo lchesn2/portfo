@@ -16,13 +16,11 @@ PythonAnywhere setup:
   - Add a Scheduled Task: python /path/to/space_weather.py
   - Run every hour (or every 10 min on paid plan)
   - The output file space_weather_cache.json is read by your Flask route
+  - Activate venv: source /Users/larahchesnic/Documents/virtualEnvironments/venvSites/bin/activate
 """
 
 import json
 import logging
-import os
-import re
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -58,7 +56,7 @@ def fetch_json(url: str):
         resp = requests.get(url, timeout=REQUEST_TIMEOUT)
         resp.raise_for_status()
         return resp.json()
-    except requests.RequestException as e:
+    except (requests.RequestException, OSError) as e:
         log.warning("Failed to fetch %s: %s", url, e)
         return None
 
@@ -109,7 +107,7 @@ def parse_solar_wind(plasma_raw: list, mag_raw: list) -> dict:
         for row in reversed(mag_raw[1:]):
             try:
                 result["bz"] = round(float(row[3]), 1)
-                result["bt"] = round(float(row[4]), 1)
+                result["bt"] = round(float(row[6]), 1)  # bt moved to index 6 in updated NOAA format
                 break
             except (TypeError, ValueError, IndexError):
                 continue
@@ -128,15 +126,14 @@ def parse_kp(kp_raw: list) -> dict:
     if not kp_raw:
         return result
 
-    rows = kp_raw[1:]  # skip header
     readings = []
-    for row in rows:
+    for row in kp_raw:
         try:
             readings.append({
-                "time": row[0],
-                "kp":   float(row[1])
+                "time": row["time_tag"],
+                "kp":   float(row["Kp"])
             })
-        except (TypeError, ValueError, IndexError):
+        except (TypeError, ValueError, KeyError):
             continue
 
     if readings:
