@@ -3,3 +3,4 @@ __pycache__/
 .venv/
 .env
 static/data/space_weather_cache.json
+SITE_WIREFRAME.md

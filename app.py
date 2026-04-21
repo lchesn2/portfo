@@ -11,8 +11,11 @@ from pathlib import Path
 from datetime import datetime, timezone
 import json
 
-# -- import your fetcher
-from space_weather import fetch_all, write_cache, load_cache
+try:
+    from space_weather import fetch_all, write_cache, load_cache
+    _space_weather_ok = True
+except Exception:
+    _space_weather_ok = False
 
 app = Flask(__name__)
 
@@ -35,6 +38,22 @@ def space():
     On PythonAnywhere free tier, the scheduled task keeps cache fresh so
     live fetches here are just a safety net.
     """
+    _unavailable = {
+        "fetched_at": None,
+        "solar_wind": {"speed": None, "density": None, "bz": None, "bt": None},
+        "kp":         {"current": None, "history": []},
+        "scales":     {
+            "G": {"scale": "—", "label": "Unavailable"},
+            "S": {"scale": "—", "label": "Unavailable"},
+            "R": {"scale": "—", "label": "Unavailable"},
+        },
+        "aurora":  {"label": "Unavailable", "latitude": None},
+        "alerts":  [],
+    }
+
+    if not _space_weather_ok:
+        return render_template("space.html", sw=_unavailable)
+
     data = load_cache()
 
     if data is None or cache_is_stale(data):
@@ -43,19 +62,7 @@ def space():
             write_cache(data)
         except Exception as e:
             app.logger.error("Live fetch failed: %s", e)
-            # Fall back to empty structure so template doesn't crash
-            data = {
-                "fetched_at": None,
-                "solar_wind": {"speed": None, "density": None, "bz": None, "bt": None},
-                "kp":         {"current": None, "history": []},
-                "scales":     {
-                    "G": {"scale": "—", "label": "Unavailable"},
-                    "S": {"scale": "—", "label": "Unavailable"},
-                    "R": {"scale": "—", "label": "Unavailable"},
-                },
-                "aurora":  {"label": "Unavailable", "latitude": None},
-                "alerts":  [],
-            }
+            data = _unavailable
 
     return render_template("space.html", sw=data)
 
