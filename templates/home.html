@@ -3,66 +3,79 @@
 
 {% block content %}
 <style>
-  /* ── Hero card ── */
-  .hero {
+  /* ── Hero ── */
+  .hero { display: block; margin-bottom: 2rem; }
+
+  .hero__card {
+    background: #13161e;
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    padding: 1.6rem;
     display: grid;
-    grid-template-columns: 160px 1fr;
-    gap: 0;
-    margin-bottom: 2rem;
+    grid-template-columns: 144px 1fr;
+    grid-template-areas:
+      "portrait header"
+      "portrait bio"
+      "portrait actions";
+    grid-template-rows: auto auto auto;
+    column-gap: 1.5rem;
   }
-  .hero .headshot {
-    width: 160px;
-    height: 200px;
+
+  .hero__portrait {
+    grid-area: portrait;
+    width: 144px;
+    height: 192px;
     object-fit: cover;
     object-position: center top;
-    border-radius: 10px 0 0 10px;
+    border-radius: 8px;
     display: block;
-    flex-shrink: 0;
+    align-self: start;
   }
-  .hero__panel {
-    background: #161616;
-    border: 1px solid var(--line-strong);
-    border-left: none;
-    border-radius: 0 10px 10px 0;
-    padding: 1.4rem 1.6rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
+
+  .hero__header { grid-area: header; }
+
   .hero__name {
     font-family: 'Bebas Neue', sans-serif;
     font-size: clamp(2.8rem, 6vw, 4.5rem);
     letter-spacing: 0.04em;
     color: var(--text);
-    margin: 0 0 0.45rem;
+    margin: 0 0 0.4rem;
     line-height: 1.1;
   }
+
   .hero__roles {
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
-    margin-bottom: 0.9rem;
   }
+
   .hero__role-tag {
     font-family: 'DM Mono', monospace;
     font-size: 0.63rem;
-    color: #e8a832;
-    background: rgba(212,146,42,0.16);
-    border: 1px solid rgba(212,146,42,0.38);
+    color: #8cabd6;
+    background: rgba(46,92,200,0.14);
+    border: 1px solid rgba(46,92,200,0.28);
     border-radius: 4px;
     padding: 0.15rem 0.5rem;
   }
+
   .hero__bio {
+    grid-area: bio;
     font-size: 0.82rem;
     color: var(--muted);
     line-height: 1.8;
-    margin: 0 0 1.1rem;
+    margin: 0.65rem 0 0;
     max-width: 46ch;
+    align-self: start;
   }
+
   .hero__actions {
+    grid-area: actions;
     display: flex;
     gap: 0.6rem;
     flex-wrap: wrap;
+    margin-top: 1rem;
+    align-self: end;
   }
 
   /* ── Skill strips ── */
@@ -102,25 +115,56 @@
     padding: 0.1rem 0.4rem;
   }
 
+  /* ── Mobile ── */
   @media (max-width: 520px) {
-    .hero { grid-template-columns: 1fr; }
-    .hero .headshot { width: 100%; height: 180px; border-radius: 10px 10px 0 0; }
-    .hero__panel { border-left: 1px solid var(--line-strong); border-top: none; border-radius: 0 0 10px 10px; }
+    .hero__card {
+      display: flex;
+      flex-direction: column;
+      padding: 1.3rem;
+    }
+
+    .hero__header  { order: 1; }
+    .hero__portrait {
+      order: 2;
+      width: 80px;
+      height: 107px;
+      border-radius: 7px;
+      margin: 0.85rem 0;
+      align-self: flex-start;
+    }
+    .hero__bio {
+      order: 3;
+      margin: 0;
+      max-width: none;
+    }
+    .hero__actions {
+      order: 4;
+      margin-top: 1.1rem;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .hero__actions .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
     .home-skills { grid-template-columns: 1fr; }
   }
 </style>
 
 <!-- Hero -->
 <div class="hero">
-  <img src="{{ url_for('static', filename='img/IMG_2.png') }}"
-       alt="Larah"
-       class="headshot">
-  <div class="hero__panel">
-    <h1 class="hero__name">Larah</h1>
-    <div class="hero__roles">
-      <span class="hero__role-tag">BI Engineer</span>
-      <span class="hero__role-tag">Data Engineer</span>
-      <span class="hero__role-tag">Analytics Engineer</span>
+  <div class="hero__card">
+    <img class="hero__portrait"
+         src="{{ url_for('static', filename='img/IMG_2.png') }}"
+         alt="Larah">
+    <div class="hero__header">
+      <h1 class="hero__name">Larah</h1>
+      <div class="hero__roles">
+        <span class="hero__role-tag">BI Engineer</span>
+        <span class="hero__role-tag">Data Engineer</span>
+        <span class="hero__role-tag">Analytics Engineer</span>
+      </div>
     </div>
     <p class="hero__bio">Five years connecting people, systems, and data — building pipelines, models, and apps that help teams move faster without sacrificing quality.</p>
     <div class="hero__actions">

@@ -16,7 +16,7 @@ PythonAnywhere setup:
   - Add a Scheduled Task: python /path/to/space_weather.py
   - Run every hour (or every 10 min on paid plan)
   - The output file space_weather_cache.json is read by your Flask route
-  - Activate venv: source /Users/larahchesnic/Documents/virtualEnvironments/venvSites/bin/activate
+  - Activate venv: source /path/to/venv/bin/activate
 """
 
 import json

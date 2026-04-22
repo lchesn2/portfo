@@ -10,6 +10,8 @@ from flask import Flask, render_template
 from pathlib import Path
 from datetime import datetime, timezone
 import json
+import os
+import time
 
 try:
     from space_weather import fetch_all, write_cache, load_cache
@@ -18,6 +20,26 @@ except Exception:
     _space_weather_ok = False
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or os.urandom(24).hex()
+
+_last_refresh: float = 0.0
+_REFRESH_COOLDOWN = 60  # seconds
+
+
+@app.after_request
+def set_security_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['Referrer-Policy'] = 'no-referrer'
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "
+        "style-src 'self' https://fonts.googleapis.com; "
+        "font-src https://fonts.gstatic.com; "
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "img-src 'self' data:; "
+        "connect-src 'self'"
+    )
+    return response
 
 
 def cache_is_stale(payload: dict, max_age_minutes: int = 120) -> bool:
@@ -77,20 +99,25 @@ def space_refresh():
     Fetches fresh NOAA data, writes cache, returns JSON so the button can
     update the badge label before the page reloads.
     """
+    global _last_refresh
+    if time.time() - _last_refresh < _REFRESH_COOLDOWN:
+        return {"ok": False, "error": "Please wait before refreshing again."}, 429
+    _last_refresh = time.time()
+
     try:
         data = fetch_all()
         write_cache(data)
         return {
-            "ok":              True,
-            "fetched_at":      data["fetched_at"],
+            "ok":               True,
+            "fetched_at":       data["fetched_at"],
             "solar_wind_speed": data["solar_wind"].get("speed"),
-            "bz":              data["solar_wind"].get("bz"),
-            "kp":              data["kp"].get("current"),
-            "g_scale":         data["scales"]["G"].get("scale"),
+            "bz":               data["solar_wind"].get("bz"),
+            "kp":               data["kp"].get("current"),
+            "g_scale":          data["scales"]["G"].get("scale"),
         }
     except Exception as e:
         app.logger.error("Manual refresh failed: %s", e)
-        return {"ok": False, "error": str(e)}, 500
+        return {"ok": False, "error": "Data refresh failed. Please try again."}, 500
 
 @app.route("/")
 def home():

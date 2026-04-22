@@ -116,7 +116,7 @@
           {% set bz_mag = sw.solar_wind.bz if sw.solar_wind.bz >= 0 else sw.solar_wind.bz * -1 %}
           {% set bz_pct = ((bz_mag / 30) * 100) | int %}
           {% set bz_pct = 100 if bz_pct > 100 else bz_pct %}
-          {% set bz_color = '#9a6e00' if sw.solar_wind.bz < -10 else 'var(--moss-mid)' %}
+          {% set bz_color = '#b88a30' if sw.solar_wind.bz < -10 else 'var(--moss-mid)' %}
           <div class="sw-bar-track">
             <div class="sw-bar-fill" style="width: {{ bz_pct }}%; background: {{ bz_color }};"></div>
           </div>
@@ -306,7 +306,7 @@ async function refreshData() {
   if (!result.ok) {
     btn.disabled    = false;
     btn.textContent = '↻ Retry';
-    dot.style.background = '#b83232';
+    dot.style.background = '#c44444';
   }
 }
 </script>
